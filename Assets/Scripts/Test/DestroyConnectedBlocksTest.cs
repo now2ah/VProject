@@ -14,11 +14,6 @@ public class DestroyConnectedBlocksTest : MonoBehaviour
 
     private void Start()
     {
-        List<Vector2Int> connectedBlockIndex = _gridService.GetConnectedBlocks(2, 2);
-
-        foreach (var index in connectedBlockIndex)
-        {
-            Debug.Log(index);
-        }
+        _gridService.ProcessInput(2, 2);
     }
 }
