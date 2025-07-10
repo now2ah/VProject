@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using VProject.Util;
+using VProject.Utils;
 
 namespace VProject.Domains
 {
@@ -28,11 +28,11 @@ namespace VProject.Domains
             }
         }
 
-        public void DestroyBlock(int x, int y)
+        public void DestroyBlock(int x, int y, Action callback = null)
         {
-            _blockGrid[x,y].Destroy();
+            _blockGrid[y, x].Destroy();
 
-            //move blocks along y axis
+            callback?.Invoke();
         }
 
         public List<Vector2Int> GetConnectedBlocks(int x, int y)
@@ -47,21 +47,21 @@ namespace VProject.Domains
             while (connectedBlockQueue.Count > 0)
             {
                 Vector2Int rootIndex = connectedBlockQueue.Dequeue();
-                Block rootBlock = _blockGrid[rootIndex.x, rootIndex.y];
-                isVisited[rootIndex.x, rootIndex.y] = true;
+                Block rootBlock = _blockGrid[rootIndex.y, rootIndex.x];
+                isVisited[rootIndex.y, rootIndex.x] = true;
 
                 for (int i = 0; i < 4; ++i)
                 {
                     int newX = rootIndex.x + dx[i];
                     int newY = rootIndex.y + dy[i];
 
-                    if (newX > 0 && newX < _blockGrid.GetLength(1) &&
-                        newY > 0 && newY < _blockGrid.GetLength(0))
+                    if (newX >= 0 && newX < _blockGrid.GetLength(1) &&
+                        newY >= 0 && newY < _blockGrid.GetLength(0))
                     {
-                        if (!isVisited[newX, newY] &&
-                            _blockGrid[newX, newY].type == rootBlock.type)
+                        if (!isVisited[newY, newX] &&
+                            _blockGrid[newY, newX].type == rootBlock.type)
                         {
-                            isVisited[newX, newY] = true;
+                            isVisited[newY, newX] = true;
                             connectedBlockQueue.Enqueue(new Vector2Int(newX, newY));
                             connectedBlockList.Add(new Vector2Int(newX, newY));
                         }

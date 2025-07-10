@@ -2,7 +2,7 @@
 using System;
 using VProject.Domains;
 
-namespace VProject.Util
+namespace VProject.Utils
 {
     public class BlockFactory
     {

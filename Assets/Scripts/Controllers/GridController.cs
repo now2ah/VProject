@@ -1,5 +1,8 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using VProject.Services;
+using VProject.Utils;
 using VProject.Views;
 
 public class GridController : MonoBehaviour
@@ -7,33 +10,74 @@ public class GridController : MonoBehaviour
     [SerializeField] private Transform _blockPrefab;
     private GridService _gridService;
     private Grid _grid;
+    private List<Transform> _blockList;
 
     private void Awake()
     {
         _gridService = new GridService();
         _grid = GetComponent<Grid>();
+        _blockList = new List<Transform>();
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private void OnEnable()
+    {
+        InputHandler.OnClickAction += InputHandler_OnClickAction;
+        _gridService.OnDestroyBlock += GridService_OnDestroyBlock;
+    }
+
+    private void OnDisable()
+    {
+        InputHandler.OnClickAction -= InputHandler_OnClickAction;
+        _gridService.OnDestroyBlock -= GridService_OnDestroyBlock;
+    }
+
     void Start()
     {
         for (int y = 0; y < _gridService.GetGridSize(); ++y)
         {
             for (int x = 0; x < _gridService.GetGridSize(); ++x)
             {
-                Vector3 spawnPosition = _grid.CellToWorld(new Vector3Int(x, y));
+                Vector3 spawnPosition = _grid.GetCellCenterWorld(new Vector3Int(x, y));
                 Transform newBlock = Instantiate(_blockPrefab, spawnPosition, Quaternion.identity);
                 if (newBlock.TryGetComponent<BlockView>(out BlockView blockView))
                 {
+                    blockView.SetIndex(x, y);
                     blockView.SetColor(_gridService.GetBlock(x, y).type);
                 }
+                _blockList.Add(newBlock);
             }
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void InputHandler_OnClickAction()
     {
-        
+        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.value);
+        Vector3Int cellPosition = _grid.WorldToCell(worldPosition);
+
+        Debug.Log($"clicked cell position {cellPosition}");
+
+        _gridService.ProcessInput(cellPosition.x, cellPosition.y);
+    }
+
+    private void GridService_OnDestroyBlock(Vector2Int index)
+    {
+        List<Transform> deleteBlockViews = new List<Transform>();
+
+        foreach (var block in _blockList)
+        {
+            if (block.TryGetComponent<BlockView>(out BlockView blockView))
+            {
+                if (blockView.Index == index)
+                {
+                    deleteBlockViews.Add(block);
+                }
+            }
+        }
+
+        foreach (var block in deleteBlockViews)
+        {
+            _blockList.Remove(block);
+            Destroy(block.gameObject);
+        }
     }
 }

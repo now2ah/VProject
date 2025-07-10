@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Grid = VProject.Domains.Grid;
 using VProject.Domains;
+using System;
 
 namespace VProject.Services
 {
@@ -12,6 +13,8 @@ namespace VProject.Services
         private Grid _grid;
 
         public Grid BlockGrid => _grid;
+
+        public event Action<Vector2Int> OnDestroyBlock;
 
         public GridService()
         {
@@ -29,7 +32,10 @@ namespace VProject.Services
             
             foreach (var index in connectedBlockList)
             {
-                _grid.DestroyBlock(x, y);
+                _grid.DestroyBlock(index.x, index.y, () =>
+                {
+                    OnDestroyBlock?.Invoke(new Vector2Int(index.x, index.y));
+                });
             }
 
             _grid.ApplyGridGravity();

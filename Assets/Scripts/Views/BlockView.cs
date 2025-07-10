@@ -7,6 +7,16 @@ namespace VProject.Views
     {
         [SerializeField] private Renderer _renderer;
 
+        private Vector2Int _index;
+
+        public Vector2Int Index => _index;
+
+        public void SetIndex(int x, int y)
+        {
+            _index.x = x;
+            _index.y = y;
+        }
+
         public void SetColor(EBlockType type)
         {
             switch (type)
