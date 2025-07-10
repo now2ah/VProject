@@ -96,7 +96,7 @@ namespace VProject.Domains
             }
         }
 
-        public void FillEmptyBlocks()
+        public void FillEmptyBlocks(Action<Vector2Int, Block> onCreateCallback)
         {
             for (int y = 0; y < _blockGrid.GetLength(0); ++y)
             {
@@ -105,6 +105,7 @@ namespace VProject.Domains
                     if (_blockGrid[y, x].type == EBlockType.None)
                     {
                         _blockGrid[y, x] = _blockFactory.CreateRandomBlock();
+                        onCreateCallback?.Invoke(new Vector2Int(x, y), _blockGrid[y, x]);
                     }
                 }
             }

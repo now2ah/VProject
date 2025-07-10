@@ -25,6 +25,7 @@ public class GridController : MonoBehaviour
         InputHandler.OnClickAction += InputHandler_OnClickAction;
         _gridService.OnDestroyBlock += GridService_OnDestroyBlock;
         _gridService.OnMoveBlock += GridService_OnMoveBlock;
+        _gridService.OnCreateBlock += GridService_OnCreateBlock;
     }
 
     private void OnDisable()
@@ -32,6 +33,7 @@ public class GridController : MonoBehaviour
         InputHandler.OnClickAction -= InputHandler_OnClickAction;
         _gridService.OnDestroyBlock -= GridService_OnDestroyBlock;
         _gridService.OnMoveBlock -= GridService_OnMoveBlock;
+        _gridService.OnCreateBlock -= GridService_OnCreateBlock;
     }
 
     void Start()
@@ -96,5 +98,17 @@ public class GridController : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void GridService_OnCreateBlock(Vector2Int index, VProject.Domains.Block block)
+    {
+        Vector3 spawnPosition = _grid.GetCellCenterWorld(new Vector3Int(index.x, index.y));
+        Transform newBlock = Instantiate(_blockPrefab, spawnPosition, Quaternion.identity);
+        if (newBlock.TryGetComponent<BlockView>(out BlockView blockView))
+        {
+            blockView.SetIndex(index.x, index.y);
+            blockView.SetColor(block.type);
+        }
+        _blockList.Add(newBlock);
     }
 }

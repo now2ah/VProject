@@ -8,7 +8,7 @@ namespace VProject.Services
 {
     public class GridService
     {
-        private const int GRID_SIZE = 5;
+        private const int GRID_SIZE = 3;
 
         private Grid _grid;
 
@@ -16,6 +16,7 @@ namespace VProject.Services
 
         public event Action<Vector2Int> OnDestroyBlock;
         public event Action<Vector2Int, Vector2Int> OnMoveBlock;
+        public event Action<Vector2Int, Block> OnCreateBlock;
 
         public GridService()
         {
@@ -44,7 +45,10 @@ namespace VProject.Services
                 OnMoveBlock?.Invoke(origin, destination);
             });
 
-            _grid.FillEmptyBlocks();
+            _grid.FillEmptyBlocks((index, block) =>
+            {
+                OnCreateBlock?.Invoke(index, block);
+            });
         }
     }
 }
