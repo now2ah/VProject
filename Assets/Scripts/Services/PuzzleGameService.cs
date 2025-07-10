@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace VProject.Service
+namespace VProject.Services
 {
     public class PuzzleGameService
     {

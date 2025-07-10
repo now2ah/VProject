@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using Grid = VProject.Domains.Grid;
+using VProject.Domains;
 
 namespace VProject.Services
 {
@@ -10,10 +11,16 @@ namespace VProject.Services
 
         private Grid _grid;
 
+        public Grid BlockGrid => _grid;
+
         public GridService()
         {
             _grid = new Grid(GRID_SIZE);
         }
+
+        public int GetGridSize() => GRID_SIZE;
+
+        public Block GetBlock(int x, int y) => _grid.BlockGrid[y, x];
 
         public void ProcessInput(int x, int y)
         {
