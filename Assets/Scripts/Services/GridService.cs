@@ -15,6 +15,7 @@ namespace VProject.Services
         public Grid BlockGrid => _grid;
 
         public event Action<Vector2Int> OnDestroyBlock;
+        public event Action<Vector2Int, Vector2Int> OnMoveBlock;
 
         public GridService()
         {
@@ -38,7 +39,10 @@ namespace VProject.Services
                 });
             }
 
-            _grid.ApplyGridGravity();
+            _grid.ApplyGridGravity((origin, destination) =>
+            {
+                OnMoveBlock?.Invoke(origin, destination);
+            });
 
             _grid.FillEmptyBlocks();
         }

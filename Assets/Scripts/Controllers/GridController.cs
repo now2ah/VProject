@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -23,12 +24,14 @@ public class GridController : MonoBehaviour
     {
         InputHandler.OnClickAction += InputHandler_OnClickAction;
         _gridService.OnDestroyBlock += GridService_OnDestroyBlock;
+        _gridService.OnMoveBlock += GridService_OnMoveBlock;
     }
 
     private void OnDisable()
     {
         InputHandler.OnClickAction -= InputHandler_OnClickAction;
         _gridService.OnDestroyBlock -= GridService_OnDestroyBlock;
+        _gridService.OnMoveBlock -= GridService_OnMoveBlock;
     }
 
     void Start()
@@ -78,6 +81,20 @@ public class GridController : MonoBehaviour
         {
             _blockList.Remove(block);
             Destroy(block.gameObject);
+        }
+    }
+
+    private void GridService_OnMoveBlock(Vector2Int origin, Vector2Int destination)
+    {
+        foreach (var block in _blockList)
+        {
+            if (block.TryGetComponent<BlockView>(out BlockView blockView))
+            {
+                if (blockView.Index == origin)
+                {
+                    block.transform.position = _grid.GetCellCenterWorld(new Vector3Int(destination.x, destination.y));
+                }
+            }
         }
     }
 }

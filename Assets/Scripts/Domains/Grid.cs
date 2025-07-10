@@ -72,7 +72,7 @@ namespace VProject.Domains
             return connectedBlockList;
         }
 
-        public void ApplyGridGravity()
+        public void ApplyGridGravity(Action<Vector2Int, Vector2Int> onMoveCallback)
         {
             for (int x = 0; x < _blockGrid.GetLength(1); ++x)
             {
@@ -86,6 +86,8 @@ namespace VProject.Domains
                             {
                                 _blockGrid[y, x].type = _blockGrid[aboveY, x].type;
                                 _blockGrid[aboveY, x].type = EBlockType.None;
+
+                                onMoveCallback?.Invoke(new Vector2Int(x, aboveY), new Vector2Int(x, y));
                                 break;
                             }
                         }
