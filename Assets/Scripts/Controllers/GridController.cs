@@ -21,6 +21,7 @@ public class GridController : MonoBehaviour
         _grid = GetComponent<Grid>();
         _blockViewList = new List<Transform>();
         _blockViewFactory = GetComponent<BlockViewFactory>();
+        AlignCameraToGrid(_grid);
     }
 
     private void OnEnable()
@@ -94,5 +95,16 @@ public class GridController : MonoBehaviour
         Vector3 spawnPosition = _grid.GetCellCenterWorld(new Vector3Int(index.x, index.y));
         Transform newBlockView = _blockViewFactory.GenerateBlockView(spawnPosition, block, _grid);
         _blockViewList.Add(newBlockView);
+    }
+
+    private void AlignCameraToGrid(Grid grid)
+    {
+        CameraManager.Instance.FocusOn(new Vector3
+            (
+                (grid.cellSize.x * _gridService.GetGridSize()) / 2,
+                (grid.cellSize.y * _gridService.GetGridSize()) / 2,
+                0
+            ),
+            (Mathf.Max(grid.cellSize.x, grid.cellSize.y) * _gridService.GetGridSize()));
     }
 }

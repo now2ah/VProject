@@ -8,7 +8,7 @@ namespace VProject.Services
 {
     public class GridService
     {
-        private const int GRID_SIZE = 5;
+        private const int GRID_SIZE = 18;
 
         private Grid _grid;
 
