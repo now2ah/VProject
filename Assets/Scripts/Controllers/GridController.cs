@@ -6,6 +6,7 @@ using VProject.Domains;
 using VProject.Utils;
 using VProject.Views;
 using Grid = UnityEngine.Grid;
+using System;
 
 [RequireComponent(typeof(BlockViewFactory))]
 public class GridController : MonoBehaviour
@@ -15,6 +16,8 @@ public class GridController : MonoBehaviour
     private List<Transform> _blockViewList;
     private BlockViewFactory _blockViewFactory;
 
+    public event Action<Vector3, int> OnGridViewGenerated;
+
     private void Awake()
     {
         _gridService = new GridService();
@@ -22,6 +25,13 @@ public class GridController : MonoBehaviour
         _blockViewList = new List<Transform>();
         _blockViewFactory = GetComponent<BlockViewFactory>();
         AlignCameraToGrid(_grid);
+        Vector3 gridCenterPosition = new Vector3
+            (
+                (_grid.cellSize.x * _gridService.GetGridSize()) / 2,
+                (_grid.cellSize.y * _gridService.GetGridSize()) / 2,
+                0
+            );
+        OnGridViewGenerated?.Invoke(gridCenterPosition, _gridService.GetGridSize());
     }
 
     private void OnEnable()
