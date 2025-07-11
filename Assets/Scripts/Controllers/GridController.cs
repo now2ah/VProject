@@ -1,31 +1,33 @@
-using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using VProject.Services;
+using VProject.Domains;
 using VProject.Utils;
 using VProject.Views;
+using Grid = UnityEngine.Grid;
 
+[RequireComponent(typeof(BlockViewFactory))]
 public class GridController : MonoBehaviour
 {
-    [SerializeField] private Transform _blockPrefab;
     private GridService _gridService;
     private Grid _grid;
-    [SerializeField] private List<Transform> _blockList;
+    private List<Transform> _blockViewList;
+    private BlockViewFactory _blockViewFactory;
 
     private void Awake()
     {
         _gridService = new GridService();
         _grid = GetComponent<Grid>();
-        _blockList = new List<Transform>();
+        _blockViewList = new List<Transform>();
+        _blockViewFactory = GetComponent<BlockViewFactory>();
     }
 
     private void OnEnable()
     {
         InputHandler.OnClickAction += InputHandler_OnClickAction;
         _gridService.OnDestroyBlock += GridService_OnDestroyBlock;
-        _gridService.OnMoveBlock += GridService_OnMoveBlock;
+        //_gridService.OnMoveBlock += GridService_OnMoveBlock;
         _gridService.OnCreateBlock += GridService_OnCreateBlock;
     }
 
@@ -33,7 +35,7 @@ public class GridController : MonoBehaviour
     {
         InputHandler.OnClickAction -= InputHandler_OnClickAction;
         _gridService.OnDestroyBlock -= GridService_OnDestroyBlock;
-        _gridService.OnMoveBlock -= GridService_OnMoveBlock;
+        //_gridService.OnMoveBlock -= GridService_OnMoveBlock;
         _gridService.OnCreateBlock -= GridService_OnCreateBlock;
     }
 
@@ -44,13 +46,8 @@ public class GridController : MonoBehaviour
             for (int x = 0; x < _gridService.GetGridSize(); ++x)
             {
                 Vector3 spawnPosition = _grid.GetCellCenterWorld(new Vector3Int(x, y));
-                Transform newBlock = Instantiate(_blockPrefab, spawnPosition, Quaternion.identity);
-                if (newBlock.TryGetComponent<BlockView>(out BlockView blockView))
-                {
-                    blockView.SetIndex(x, y);
-                    blockView.SetColor(_gridService.GetBlock(x, y).type);
-                }
-                _blockList.Add(newBlock);
+                Transform newBlockView = _blockViewFactory.GenerateBlockView(spawnPosition, _gridService.GetBlock(x, y), _grid);
+                _blockViewList.Add(newBlockView);
             }
         }
     }
@@ -74,53 +71,45 @@ public class GridController : MonoBehaviour
 
     private void GridService_OnDestroyBlock(Vector2Int index)
     {
-        StringBuilder logMessage = new StringBuilder();
         List<Transform> deleteBlockViews = new List<Transform>();
 
-        foreach (var block in _blockList)
+        foreach (var block in _blockViewList)
         {
             if (block.TryGetComponent<BlockView>(out BlockView blockView))
             {
-                if (blockView.Index == index)
+                if (blockView.BlockData.Index == index)
                 {
-                    logMessage.Append(index.ToString() + "/");
                     deleteBlockViews.Add(block);
                 }
             }
         }
-        Debug.Log(logMessage.Append(" deleted").ToString());
 
         foreach (var block in deleteBlockViews)
         {
-            _blockList.Remove(block);
+            _blockViewList.Remove(block);
             Destroy(block.gameObject);
         }
     }
 
-    private void GridService_OnMoveBlock(Vector2Int origin, Vector2Int destination)
-    {
-        foreach (var block in _blockList)
-        {
-            if (block.TryGetComponent<BlockView>(out BlockView blockView))
-            {
-                if (blockView.Index == origin)
-                {
-                    blockView.SetIndex(destination.x, destination.y);
-                    block.transform.position = _grid.GetCellCenterWorld(new Vector3Int(destination.x, destination.y));
-                }
-            }
-        }
-    }
+    //private void GridService_OnMoveBlock(Vector2Int origin, Vector2Int destination)
+    //{
+    //    foreach (var block in _blockViewList)
+    //    {
+    //        if (block.TryGetComponent<BlockView>(out BlockView blockView))
+    //        {
+    //            if (blockView.BlockData.Index == origin)
+    //            {
+    //                blockView.SetIndex(destination.x, destination.y);
+    //                block.transform.position = _grid.GetCellCenterWorld(new Vector3Int(destination.x, destination.y));
+    //            }
+    //        }
+    //    }
+    //}
 
-    private void GridService_OnCreateBlock(Vector2Int index, VProject.Domains.Block block)
+    private void GridService_OnCreateBlock(Vector2Int index, Block block)
     {
         Vector3 spawnPosition = _grid.GetCellCenterWorld(new Vector3Int(index.x, index.y));
-        Transform newBlock = Instantiate(_blockPrefab, spawnPosition, Quaternion.identity);
-        if (newBlock.TryGetComponent<BlockView>(out BlockView blockView))
-        {
-            blockView.SetIndex(index.x, index.y);
-            blockView.SetColor(block.type);
-        }
-        _blockList.Add(newBlock);
+        Transform newBlockView = _blockViewFactory.GenerateBlockView(spawnPosition, block, _grid);
+        _blockViewList.Add(newBlockView);
     }
 }

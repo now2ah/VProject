@@ -36,7 +36,6 @@ namespace VProject.Services
             {
                 _grid.DestroyBlock(index.x, index.y, () =>
                 {
-                    Debug.Log($"Block at ({index.x}, {index.y}) destroyed.");
                     OnDestroyBlock?.Invoke(new Vector2Int(index.x, index.y));
                 });
             }

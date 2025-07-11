@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Unity.VisualScripting;
 using UnityEngine;
 using VProject.Utils;
 
@@ -20,11 +21,11 @@ namespace VProject.Domains
         {
             _blockGrid = new Block[gridSize, gridSize];
             _blockFactory = new BlockFactory();
-            for (int i = 0; i < _blockGrid.GetLength(0); ++i)
+            for (int y = 0; y < _blockGrid.GetLength(0); ++y)
             {
-                for (int j = 0; j < _blockGrid.GetLength(1); ++j)
+                for (int x = 0; x < _blockGrid.GetLength(1); ++x)
                 {
-                    _blockGrid[i,j] = _blockFactory.CreateRandomBlock();
+                    _blockGrid[y, x] = _blockFactory.CreateRandomBlock(new Vector2Int(x, y));
                 }
             }
         }
@@ -60,7 +61,7 @@ namespace VProject.Domains
                         newY >= 0 && newY < _blockGrid.GetLength(0))
                     {
                         if (!isVisited[newY, newX] &&
-                            _blockGrid[newY, newX].type == rootBlock.type)
+                            _blockGrid[newY, newX].Type == rootBlock.Type)
                         {
                             isVisited[newY, newX] = true;
                             connectedBlockQueue.Enqueue(new Vector2Int(newX, newY));
@@ -78,31 +79,21 @@ namespace VProject.Domains
             {
                 for (int y = 0; y < _blockGrid.GetLength(0); ++y)
                 {
-                    if (_blockGrid[y, x].type == EBlockType.None)
+                    if (_blockGrid[y, x].IsEmptyBlock())
                     {
                         for (int aboveY = y + 1; aboveY < _blockGrid.GetLength(0); ++aboveY)
                         {
-                            if (_blockGrid[aboveY, x].type != EBlockType.None)
+                            if (_blockGrid[aboveY, x].IsEmptyBlock() == false)
                             {
-                                _blockGrid[y, x].type = _blockGrid[aboveY, x].type;
-                                _blockGrid[aboveY, x].type = EBlockType.None;
+                                MoveBlock(_blockGrid[aboveY, x], _blockGrid[y, x]);
+                                SetEmptyBlock(x, aboveY);
 
-                                onMoveCallback?.Invoke(new Vector2Int(x, aboveY), new Vector2Int(x, y));
+                                //onMoveCallback?.Invoke(new Vector2Int(x, aboveY), new Vector2Int(x, y));
                                 break;
                             }
                         }
                     }
                 }
-            }
-
-            for (int y = 0; y < _blockGrid.GetLength(0); ++y)
-            {
-                StringBuilder log = new StringBuilder();
-                for (int x = 0; x < _blockGrid.GetLength(1); ++x)
-                {
-                    log.Append(_blockGrid[y, x].type.ToString() + " ");
-                }
-                Debug.Log(log.ToString());
             }
         }
 
@@ -112,13 +103,26 @@ namespace VProject.Domains
             {
                 for (int x = 0; x < _blockGrid.GetLength(1); ++x)
                 {
-                    if (_blockGrid[y, x].type == EBlockType.None)
+                    if (_blockGrid[y, x].IsEmptyBlock())
                     {
-                        _blockGrid[y, x] = _blockFactory.CreateRandomBlock();
-                        onCreateCallback?.Invoke(new Vector2Int(x, y), _blockGrid[y, x]);
+                        Vector2Int newBlockIndex = new Vector2Int(x, y);
+                        _blockGrid[y, x] = _blockFactory.CreateRandomBlock(newBlockIndex);
+                        Debug.Log($"{_blockGrid[y, x]} generated at {newBlockIndex}");
+                        onCreateCallback?.Invoke(newBlockIndex, _blockGrid[y, x]);
                     }
                 }
             }
+        }
+
+        private void MoveBlock(Block origin, Block destination)
+        {
+            destination = origin;
+            origin.ChangeIndex(new Vector2Int(destination.Index.x, destination.Index.y));
+        }
+
+        private void SetEmptyBlock(int x, int y)
+        {
+            _blockGrid[y, x] = _blockFactory.CreateBlock(new Vector2Int(x, y), EBlockType.None);
         }
     }
 }
