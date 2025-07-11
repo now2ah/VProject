@@ -22,10 +22,17 @@ namespace VProject.Views
         private void GridController_OnGridViewGenerated(Vector3 centerPosition, int gridSize)
         {
             transform.position = new Vector3(centerPosition.x, centerPosition.y, BACKGROUND_Z);
-            transform.localScale = new Vector3(gridSize / 4, 1f, gridSize / 4);
+
+            float scaleRatio = gridSize / 4;
+            if (scaleRatio < 1)
+            {
+                scaleRatio = 1;
+            }
+
+            transform.localScale = new Vector3(scaleRatio, 1f, scaleRatio);
             if (transform.TryGetComponent<Renderer>(out Renderer renderer))
             {
-                renderer.material.mainTextureScale = new Vector2(gridSize / 4, gridSize / 4);
+                renderer.material.mainTextureScale = new Vector2(scaleRatio, scaleRatio);
             }
         }
     }

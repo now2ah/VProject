@@ -5,7 +5,7 @@ namespace VProject.Utils
 {
     public class CameraManager : MonoBehaviour
     {
-        private const float PADDING_VALUE = 1f;
+        private const float PADDING_VALUE = 0f;
 
         [SerializeField] private Camera _mainCamera;
 
