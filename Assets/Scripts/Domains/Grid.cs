@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using VProject.Utils;
 
@@ -68,7 +69,6 @@ namespace VProject.Domains
                     }
                 }
             }
-
             return connectedBlockList;
         }
 
@@ -93,6 +93,16 @@ namespace VProject.Domains
                         }
                     }
                 }
+            }
+
+            for (int y = 0; y < _blockGrid.GetLength(0); ++y)
+            {
+                StringBuilder log = new StringBuilder();
+                for (int x = 0; x < _blockGrid.GetLength(1); ++x)
+                {
+                    log.Append(_blockGrid[y, x].type.ToString() + " ");
+                }
+                Debug.Log(log.ToString());
             }
         }
 

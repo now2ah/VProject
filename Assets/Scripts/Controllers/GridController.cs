@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using VProject.Services;
@@ -11,7 +12,7 @@ public class GridController : MonoBehaviour
     [SerializeField] private Transform _blockPrefab;
     private GridService _gridService;
     private Grid _grid;
-    private List<Transform> _blockList;
+    [SerializeField] private List<Transform> _blockList;
 
     private void Awake()
     {
@@ -56,16 +57,24 @@ public class GridController : MonoBehaviour
 
     private void InputHandler_OnClickAction()
     {
-        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.value);
-        Vector3Int cellPosition = _grid.WorldToCell(worldPosition);
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.value);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Block"))
+            {
+                Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.value);
+                Vector3Int cellPosition = _grid.WorldToCell(worldPosition);
 
-        Debug.Log($"clicked cell position {cellPosition}");
+                Debug.Log($"clicked cell position {cellPosition}");
 
-        _gridService.ProcessInput(cellPosition.x, cellPosition.y);
+                _gridService.ProcessInput(cellPosition.x, cellPosition.y);
+            }
+        }
     }
 
     private void GridService_OnDestroyBlock(Vector2Int index)
     {
+        StringBuilder logMessage = new StringBuilder();
         List<Transform> deleteBlockViews = new List<Transform>();
 
         foreach (var block in _blockList)
@@ -74,10 +83,12 @@ public class GridController : MonoBehaviour
             {
                 if (blockView.Index == index)
                 {
+                    logMessage.Append(index.ToString() + "/");
                     deleteBlockViews.Add(block);
                 }
             }
         }
+        Debug.Log(logMessage.Append(" deleted").ToString());
 
         foreach (var block in deleteBlockViews)
         {
@@ -94,6 +105,7 @@ public class GridController : MonoBehaviour
             {
                 if (blockView.Index == origin)
                 {
+                    blockView.SetIndex(destination.x, destination.y);
                     block.transform.position = _grid.GetCellCenterWorld(new Vector3Int(destination.x, destination.y));
                 }
             }

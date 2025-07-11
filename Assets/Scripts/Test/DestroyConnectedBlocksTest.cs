@@ -14,6 +14,6 @@ public class DestroyConnectedBlocksTest : MonoBehaviour
 
     private void Start()
     {
-        _gridService.ProcessInput(2, 2);
+        //_gridService.ProcessInput(2, 2);
     }
 }
