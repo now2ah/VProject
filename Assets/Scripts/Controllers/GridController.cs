@@ -27,7 +27,6 @@ public class GridController : MonoBehaviour
     {
         InputHandler.OnClickAction += InputHandler_OnClickAction;
         _gridService.OnDestroyBlock += GridService_OnDestroyBlock;
-        //_gridService.OnMoveBlock += GridService_OnMoveBlock;
         _gridService.OnCreateBlock += GridService_OnCreateBlock;
     }
 
@@ -35,7 +34,6 @@ public class GridController : MonoBehaviour
     {
         InputHandler.OnClickAction -= InputHandler_OnClickAction;
         _gridService.OnDestroyBlock -= GridService_OnDestroyBlock;
-        //_gridService.OnMoveBlock -= GridService_OnMoveBlock;
         _gridService.OnCreateBlock -= GridService_OnCreateBlock;
     }
 
@@ -90,21 +88,6 @@ public class GridController : MonoBehaviour
             Destroy(block.gameObject);
         }
     }
-
-    //private void GridService_OnMoveBlock(Vector2Int origin, Vector2Int destination)
-    //{
-    //    foreach (var block in _blockViewList)
-    //    {
-    //        if (block.TryGetComponent<BlockView>(out BlockView blockView))
-    //        {
-    //            if (blockView.BlockData.Index == origin)
-    //            {
-    //                blockView.SetIndex(destination.x, destination.y);
-    //                block.transform.position = _grid.GetCellCenterWorld(new Vector3Int(destination.x, destination.y));
-    //            }
-    //        }
-    //    }
-    //}
 
     private void GridService_OnCreateBlock(Vector2Int index, Block block)
     {

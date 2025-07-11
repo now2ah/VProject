@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Unity.VisualScripting;
 using UnityEngine;
 using VProject.Utils;
 
@@ -85,10 +83,8 @@ namespace VProject.Domains
                         {
                             if (_blockGrid[aboveY, x].IsEmptyBlock() == false)
                             {
-                                MoveBlock(_blockGrid[aboveY, x], _blockGrid[y, x]);
+                                MoveBlock(new Vector2Int(x, aboveY), new Vector2Int(x, y));
                                 SetEmptyBlock(x, aboveY);
-
-                                //onMoveCallback?.Invoke(new Vector2Int(x, aboveY), new Vector2Int(x, y));
                                 break;
                             }
                         }
@@ -114,10 +110,11 @@ namespace VProject.Domains
             }
         }
 
-        private void MoveBlock(Block origin, Block destination)
+        private void MoveBlock(Vector2Int origin, Vector2Int destination)
         {
-            destination = origin;
-            origin.ChangeIndex(new Vector2Int(destination.Index.x, destination.Index.y));
+            Block originBlock = _blockGrid[origin.y, origin.x];
+            _blockGrid[destination.y, destination.x] = originBlock;
+            originBlock.ChangeIndex(destination);
         }
 
         private void SetEmptyBlock(int x, int y)
