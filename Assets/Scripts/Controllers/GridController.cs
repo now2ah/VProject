@@ -16,6 +16,8 @@ public class GridController : MonoBehaviour
     private List<Transform> _blockViewList;
     private BlockViewFactory _blockViewFactory;
 
+    public GridService GridService => _gridService;
+
     public event Action<Vector3, int> OnGridViewGenerated;
 
     private void Awake()

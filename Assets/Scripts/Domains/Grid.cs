@@ -28,11 +28,11 @@ namespace VProject.Domains
             }
         }
 
-        public void DestroyBlock(int x, int y, Action callback = null)
+        public void DestroyBlock(int x, int y, Action<EBlockType> callback = null)
         {
             _blockGrid[y, x].Destroy();
 
-            callback?.Invoke();
+            callback?.Invoke(_blockGrid[y,x].Type);
         }
 
         public List<Vector2Int> GetConnectedBlocks(int x, int y)
@@ -103,7 +103,7 @@ namespace VProject.Domains
                     {
                         Vector2Int newBlockIndex = new Vector2Int(x, y);
                         _blockGrid[y, x] = _blockFactory.CreateRandomBlock(newBlockIndex);
-                        Debug.Log($"{_blockGrid[y, x]} generated at {newBlockIndex}");
+                        //Debug.Log($"{_blockGrid[y, x]} generated at {newBlockIndex}");
                         onCreateCallback?.Invoke(newBlockIndex, _blockGrid[y, x]);
                     }
                 }

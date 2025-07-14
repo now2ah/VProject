@@ -34,7 +34,7 @@ namespace VProject.Services
             
             foreach (var index in connectedBlockList)
             {
-                _grid.DestroyBlock(index.x, index.y, () =>
+                _grid.DestroyBlock(index.x, index.y, (blockType) =>
                 {
                     OnDestroyBlock?.Invoke(new Vector2Int(index.x, index.y));
                 });

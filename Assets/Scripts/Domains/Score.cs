@@ -8,6 +8,11 @@ namespace VProject.Domains
 
         public int ScoreValue => _scoreValue;
 
+        public Score(int scoreValue)
+        {
+            _scoreValue = scoreValue;
+        }
+
         public void GainScore(int gainValue)
         {
             _scoreValue += gainValue;
