@@ -8,115 +8,121 @@ using VProject.Views;
 using Grid = UnityEngine.Grid;
 using System;
 
-[RequireComponent(typeof(BlockViewFactory))]
-public class GridController : MonoBehaviour
+namespace VProject.Controllers
 {
-    private GridService _gridService;
-    private Grid _grid;
-    private List<Transform> _blockViewList;
-    private BlockViewFactory _blockViewFactory;
-
-    public GridService GridService => _gridService;
-
-    public event Action<Vector3, int> OnGridViewGenerated;
-
-    private void Awake()
+    [RequireComponent(typeof(BlockViewFactory))]
+    public class GridController : MonoBehaviour
     {
-        _gridService = new GridService();
-        _grid = GetComponent<Grid>();
-        _blockViewList = new List<Transform>();
-        _blockViewFactory = GetComponent<BlockViewFactory>();
-        AlignCameraToGrid(_grid);
-        Vector3 gridCenterPosition = new Vector3
-            (
-                (_grid.cellSize.x * _gridService.GetGridSize()) / 2,
-                (_grid.cellSize.y * _gridService.GetGridSize()) / 2,
-                0
-            );
-        OnGridViewGenerated?.Invoke(gridCenterPosition, _gridService.GetGridSize());
-    }
+        private GridService _gridService;
+        private Grid _grid;
+        private List<Transform> _blockViewList;
+        private BlockViewFactory _blockViewFactory;
+        private FXSpawner _fxSpawner;
 
-    private void OnEnable()
-    {
-        InputHandler.OnClickAction += InputHandler_OnClickAction;
-        _gridService.OnDestroyBlock += GridService_OnDestroyBlock;
-        _gridService.OnCreateBlock += GridService_OnCreateBlock;
-    }
+        public GridService GridService => _gridService;
 
-    private void OnDisable()
-    {
-        InputHandler.OnClickAction -= InputHandler_OnClickAction;
-        _gridService.OnDestroyBlock -= GridService_OnDestroyBlock;
-        _gridService.OnCreateBlock -= GridService_OnCreateBlock;
-    }
+        public event Action<Vector3, int> OnGridViewGenerated;
 
-    void Start()
-    {
-        for (int y = 0; y < _gridService.GetGridSize(); ++y)
+        private void Awake()
         {
-            for (int x = 0; x < _gridService.GetGridSize(); ++x)
-            {
-                Vector3 spawnPosition = _grid.GetCellCenterWorld(new Vector3Int(x, y));
-                Transform newBlockView = _blockViewFactory.GenerateBlockView(spawnPosition, _gridService.GetBlock(x, y), _grid);
-                _blockViewList.Add(newBlockView);
-            }
+            _gridService = new GridService();
+            _grid = GetComponent<Grid>();
+            _blockViewList = new List<Transform>();
+            _blockViewFactory = GetComponent<BlockViewFactory>();
+            _fxSpawner = GetComponent<FXSpawner>();
+            AlignCameraToGrid(_grid);
+            Vector3 gridCenterPosition = new Vector3
+                (
+                    (_grid.cellSize.x * _gridService.GetGridSize()) / 2,
+                    (_grid.cellSize.y * _gridService.GetGridSize()) / 2,
+                    0
+                );
+            OnGridViewGenerated?.Invoke(gridCenterPosition, _gridService.GetGridSize());
         }
-    }
 
-    private void InputHandler_OnClickAction()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.value);
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        private void OnEnable()
         {
-            if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Block"))
-            {
-                Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.value);
-                Vector3Int cellPosition = _grid.WorldToCell(worldPosition);
-
-                Debug.Log($"clicked cell position {cellPosition}");
-
-                _gridService.ProcessInput(cellPosition.x, cellPosition.y);
-            }
+            InputHandler.OnClickAction += InputHandler_OnClickAction;
+            _gridService.OnDestroyBlock += GridService_OnDestroyBlock;
+            _gridService.OnCreateBlock += GridService_OnCreateBlock;
         }
-    }
 
-    private void GridService_OnDestroyBlock(Vector2Int index)
-    {
-        List<Transform> deleteBlockViews = new List<Transform>();
-
-        foreach (var block in _blockViewList)
+        private void OnDisable()
         {
-            if (block.TryGetComponent<BlockView>(out BlockView blockView))
+            InputHandler.OnClickAction -= InputHandler_OnClickAction;
+            _gridService.OnDestroyBlock -= GridService_OnDestroyBlock;
+            _gridService.OnCreateBlock -= GridService_OnCreateBlock;
+        }
+
+        void Start()
+        {
+            for (int y = 0; y < _gridService.GetGridSize(); ++y)
             {
-                if (blockView.BlockData.Index == index)
+                for (int x = 0; x < _gridService.GetGridSize(); ++x)
                 {
-                    deleteBlockViews.Add(block);
+                    Vector3 spawnPosition = _grid.GetCellCenterWorld(new Vector3Int(x, y));
+                    Transform newBlockView = _blockViewFactory.GenerateBlockView(spawnPosition, _gridService.GetBlock(x, y), _grid);
+                    _blockViewList.Add(newBlockView);
                 }
             }
         }
 
-        foreach (var block in deleteBlockViews)
+        private void InputHandler_OnClickAction()
         {
-            _blockViewList.Remove(block);
-            Destroy(block.gameObject);
+            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.value);
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Block"))
+                {
+                    Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.value);
+                    Vector3Int cellPosition = _grid.WorldToCell(worldPosition);
+
+                    _fxSpawner.SpawnFX(worldPosition);
+
+                    _gridService.ProcessInput(cellPosition.x, cellPosition.y);
+                }
+            }
+        }
+
+        private void GridService_OnDestroyBlock(Vector2Int index)
+        {
+            List<Transform> deleteBlockViews = new List<Transform>();
+
+            foreach (var block in _blockViewList)
+            {
+                if (block.TryGetComponent<BlockView>(out BlockView blockView))
+                {
+                    if (blockView.BlockData.Index == index)
+                    {
+                        deleteBlockViews.Add(block);
+                    }
+                }
+            }
+
+            foreach (var block in deleteBlockViews)
+            {
+                _blockViewList.Remove(block);
+                Destroy(block.gameObject);
+            }
+        }
+
+        private void GridService_OnCreateBlock(Vector2Int index, Block block)
+        {
+            Vector3 spawnPosition = _grid.GetCellCenterWorld(new Vector3Int(index.x, index.y));
+            Transform newBlockView = _blockViewFactory.GenerateBlockView(spawnPosition, block, _grid);
+            _blockViewList.Add(newBlockView);
+        }
+
+        private void AlignCameraToGrid(Grid grid)
+        {
+            CameraManager.Instance.FocusOn(new Vector3
+                (
+                    (grid.cellSize.x * _gridService.GetGridSize()) / 2,
+                    (grid.cellSize.y * _gridService.GetGridSize()) / 2,
+                    0
+                ),
+                (Mathf.Max(grid.cellSize.x, grid.cellSize.y) * _gridService.GetGridSize()));
         }
     }
 
-    private void GridService_OnCreateBlock(Vector2Int index, Block block)
-    {
-        Vector3 spawnPosition = _grid.GetCellCenterWorld(new Vector3Int(index.x, index.y));
-        Transform newBlockView = _blockViewFactory.GenerateBlockView(spawnPosition, block, _grid);
-        _blockViewList.Add(newBlockView);
-    }
-
-    private void AlignCameraToGrid(Grid grid)
-    {
-        CameraManager.Instance.FocusOn(new Vector3
-            (
-                (grid.cellSize.x * _gridService.GetGridSize()) / 2,
-                (grid.cellSize.y * _gridService.GetGridSize()) / 2,
-                0
-            ),
-            (Mathf.Max(grid.cellSize.x, grid.cellSize.y) * _gridService.GetGridSize()));
-    }
 }
