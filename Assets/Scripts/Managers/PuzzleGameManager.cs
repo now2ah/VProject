@@ -18,5 +18,10 @@ namespace VProject.Managers
             _scoreService = new ScoreService(_gridController.GridService);
             OnPuzzleGameInitialized?.Invoke();
         }
+
+        private void OnDisable()
+        {
+            _scoreService.SaveScoreData();
+        }
     }
 }

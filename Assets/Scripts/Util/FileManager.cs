@@ -23,7 +23,7 @@ namespace VProject.Utils
             }
             else
             {
-                throw new Exception($"There's no file : {filePath}");
+                return null;
             }
         }
     }
