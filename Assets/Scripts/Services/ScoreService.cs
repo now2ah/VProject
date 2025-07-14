@@ -26,10 +26,25 @@ namespace VProject.Services
             _gridService.OnDestroyBlock += GridService_OnDestroyBlock;
         }
 
+        public void SaveScoreData()
+        {
+
+        }
+
+        private void LoadScoreData()
+        {
+
+        }
+
         private void GridService_OnDestroyBlock(Vector2Int index)
         {
             _currentScore.GainScore(DEFAULT_BLOCKSCORE);
             OnCurrentScoreValueChanged?.Invoke(_currentScore.ScoreValue);
+
+            if (_currentScore.ScoreValue >= _highestScore.ScoreValue)
+            {
+                _highestScore.ScoreValue = _currentScore.ScoreValue;
+            }
         }
     }
 }
