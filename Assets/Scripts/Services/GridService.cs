@@ -8,15 +8,15 @@ namespace VProject.Services
 {
     public class GridService
     {
-        private const int GRID_SIZE = 5;
+        private const int GRID_SIZE = 3;
 
         private Grid _grid;
 
         public Grid BlockGrid => _grid;
 
-        public event Action<Vector2Int> OnDestroyBlock;
+        public event Action<BreakResult> OnDestroyBlock;
         public event Action<Vector2Int, Vector2Int> OnMoveBlock;
-        public event Action<Vector2Int, Block> OnCreateBlock;
+        public event Action<Vector2Int, IBreakableEntity> OnCreateBlock;
 
         public GridService()
         {
@@ -25,7 +25,7 @@ namespace VProject.Services
 
         public int GetGridSize() => GRID_SIZE;
 
-        public Block GetBlock(int x, int y) => _grid.BlockGrid[y, x];
+        public IBreakableEntity GetBlock(int x, int y) => _grid.BlockGrid[y, x];
 
         public void ProcessInput(int x, int y)
         {
@@ -34,9 +34,9 @@ namespace VProject.Services
             
             foreach (var index in connectedBlockList)
             {
-                _grid.DestroyBlock(index.x, index.y, (blockType) =>
+                _grid.DestroyBlock(index.x, index.y, (result) =>
                 {
-                    OnDestroyBlock?.Invoke(new Vector2Int(index.x, index.y));
+                    OnDestroyBlock?.Invoke(result);
                 });
             }
 

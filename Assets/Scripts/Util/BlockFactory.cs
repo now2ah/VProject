@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using VProject.Domains;
+using static VProject.Domains.NormalBlock;
 using Random = System.Random;
 
 namespace VProject.Utils
@@ -11,22 +12,26 @@ namespace VProject.Utils
         {
             switch (type)
             {
-                case EBlockType.Red:
-                    return new Block(index, EBlockType.Red);
-                case EBlockType.Yellow:
-                    return new Block(index, EBlockType.Yellow);
-                case EBlockType.Green:
-                    return new Block(index, EBlockType.Green);
-                default:
-                    return new Block(index, EBlockType.None);
-            }
-        }
+                case EBlockType.None:
+                    return new NormalBlock(index, Color.clear);
 
-        public Block CreateRandomBlock(Vector2Int index)
-        {
-            Random random = new Random();
-            int randomType = random.Next(1, Enum.GetValues(typeof(EBlockType)).Length);
-            return new Block(index, (EBlockType)randomType);
+                case EBlockType.Normal:
+                    Random random = new Random();
+                    int randomColor = random.Next(0, Enum.GetValues(typeof(ENormalBlockColor)).Length);
+                    switch ((ENormalBlockColor)randomColor)
+                    {
+                        case ENormalBlockColor.Red:
+                            return new NormalBlock(index, Color.red);
+                        case ENormalBlockColor.Yellow:
+                            return new NormalBlock(index, Color.yellow);
+                        case ENormalBlockColor.Green:
+                            return new NormalBlock(index, Color.green);
+                        default:
+                            throw new Exception("Invalid Normal Block Color");
+                    }
+                default:
+                    throw new Exception("Invalid Block Type");
+            }
         }
     }
 }

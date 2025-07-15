@@ -51,7 +51,7 @@ namespace VProject.Services
             OnHighestScoreValueChanged?.Invoke(_highestScore.ScoreValue);
         }
 
-        private void GridService_OnDestroyBlock(Vector2Int index)
+        private void GridService_OnDestroyBlock(BreakResult result)
         {
             _currentScore.GainScore(DEFAULT_BLOCKSCORE);
             OnCurrentScoreValueChanged?.Invoke(_currentScore.ScoreValue);

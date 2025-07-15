@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using VProject.Utils;
 
@@ -7,10 +8,10 @@ namespace VProject.Domains
 {
     public class Grid
     {
-        private Block[,] _blockGrid;
+        private IBreakableEntity[,] _blockGrid;
         private BlockFactory _blockFactory;
 
-        public Block[,] BlockGrid => _blockGrid;
+        public IBreakableEntity[,] BlockGrid => _blockGrid;
 
         private readonly int[] dx = { 0, 1, 0, -1 };
         private readonly int[] dy = { -1, 0, 1, 0 };
@@ -23,16 +24,16 @@ namespace VProject.Domains
             {
                 for (int x = 0; x < _blockGrid.GetLength(1); ++x)
                 {
-                    _blockGrid[y, x] = _blockFactory.CreateRandomBlock(new Vector2Int(x, y));
+                    _blockGrid[y, x] = _blockFactory.CreateBlock(new Vector2Int(x, y), EBlockType.Normal);
                 }
             }
         }
 
-        public void DestroyBlock(int x, int y, Action<EBlockType> callback = null)
+        public void DestroyBlock(int x, int y, Action<BreakResult> callback = null)
         {
-            _blockGrid[y, x].Destroy();
+            BreakResult result = _blockGrid[y, x].Break();
 
-            callback?.Invoke(_blockGrid[y,x].Type);
+            callback?.Invoke(result);
         }
 
         public List<Vector2Int> GetConnectedBlocks(int x, int y)
@@ -47,7 +48,7 @@ namespace VProject.Domains
             while (connectedBlockQueue.Count > 0)
             {
                 Vector2Int rootIndex = connectedBlockQueue.Dequeue();
-                Block rootBlock = _blockGrid[rootIndex.y, rootIndex.x];
+                IBreakableEntity rootBlock = _blockGrid[rootIndex.y, rootIndex.x];
                 isVisited[rootIndex.y, rootIndex.x] = true;
 
                 for (int i = 0; i < 4; ++i)
@@ -59,15 +60,28 @@ namespace VProject.Domains
                         newY >= 0 && newY < _blockGrid.GetLength(0))
                     {
                         if (!isVisited[newY, newX] &&
-                            _blockGrid[newY, newX].Type == rootBlock.Type)
+                            _blockGrid[newY, newX].GetBlockType() == rootBlock.GetBlockType())
                         {
-                            isVisited[newY, newX] = true;
-                            connectedBlockQueue.Enqueue(new Vector2Int(newX, newY));
-                            connectedBlockList.Add(new Vector2Int(newX, newY));
+                            if (rootBlock.GetBlockType() == EBlockType.Normal &&
+                                ((NormalBlock)_blockGrid[newY, newX]).BlockColor == ((NormalBlock)rootBlock).BlockColor)
+                            {
+                                isVisited[newY, newX] = true;
+                                connectedBlockQueue.Enqueue(new Vector2Int(newX, newY));
+                                connectedBlockList.Add(new Vector2Int(newX, newY));
+                            }
                         }
                     }
                 }
             }
+
+            //StringBuilder sb = new StringBuilder();
+            //foreach (var block in connectedBlockList)
+            //{
+            //    sb.Append(block.x.ToString());
+            //    sb.Append(", ");
+            //    sb.Append(block.y.ToString());
+            //}
+            //Debug.Log(sb.ToString());
             return connectedBlockList;
         }
 
@@ -93,7 +107,7 @@ namespace VProject.Domains
             }
         }
 
-        public void GenerateNewBlocks(Action<Vector2Int, Block> onCreateCallback)
+        public void GenerateNewBlocks(Action<Vector2Int, IBreakableEntity> onCreateCallback)
         {
             List<Block> fallBlockList = new List<Block>();
 
@@ -104,7 +118,7 @@ namespace VProject.Domains
                     if (_blockGrid[y, x].IsEmptyBlock())
                     {
                         Vector2Int newBlockIndex = new Vector2Int(x, y);
-                        Block newBlock = _blockFactory.CreateRandomBlock(newBlockIndex);
+                        Block newBlock = _blockFactory.CreateBlock(newBlockIndex, EBlockType.Normal);
 
                         fallBlockList.Add(newBlock);
                         _blockGrid[y, x] = newBlock;
@@ -118,13 +132,13 @@ namespace VProject.Domains
 
             foreach (var block in fallBlockList)
             {
-                block.ChangeIndex(block.Index);
+                block.ChangeIndex(block.GetIndex());
             }
         }
 
         private void MoveBlock(Vector2Int origin, Vector2Int destination)
         {
-            Block originBlock = _blockGrid[origin.y, origin.x];
+            IBreakableEntity originBlock = _blockGrid[origin.y, origin.x];
             _blockGrid[destination.y, destination.x] = originBlock;
             originBlock.ChangeIndex(destination);
         }
@@ -132,6 +146,8 @@ namespace VProject.Domains
         private void SetEmptyBlock(int x, int y)
         {
             _blockGrid[y, x] = _blockFactory.CreateBlock(new Vector2Int(x, y), EBlockType.None);
+            Block block = _blockGrid[y, x] as Block;
+            block.Break();
         }
     }
 }

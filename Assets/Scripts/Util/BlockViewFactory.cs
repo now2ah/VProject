@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using VProject.Domains;
 using VProject.Views;
 using Grid = UnityEngine.Grid;
@@ -9,14 +10,20 @@ namespace VProject.Utils
     {
         [SerializeField] private Transform _blockViewPrefab;
 
-        public Transform GenerateBlockView(Vector3 spawnPosition, Block block, Grid grid)
+        public Transform GenerateBlockView(Vector3 spawnPosition, IBreakableEntity block, Grid grid)
         {
-            Transform newBlockView = Instantiate(_blockViewPrefab, spawnPosition, Quaternion.identity);
-            if (newBlockView.TryGetComponent<BlockView>(out BlockView blockView))
+            switch (block.GetBlockType())
             {
-                blockView.Bind(block, grid);
+                case EBlockType.Normal:
+                    Transform newBlockView = Instantiate(_blockViewPrefab, spawnPosition, Quaternion.identity);
+                    if (newBlockView.TryGetComponent<NormalBlockView>(out NormalBlockView blockView))
+                    {
+                        blockView.Bind(block as NormalBlock, grid);
+                    }
+                    return newBlockView;
+                default:
+                    throw new Exception("Invalid Block Type");
             }
-            return newBlockView;
         }
     }
 }

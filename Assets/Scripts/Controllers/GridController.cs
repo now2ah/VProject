@@ -84,15 +84,15 @@ namespace VProject.Controllers
             }
         }
 
-        private void GridService_OnDestroyBlock(Vector2Int index)
+        private void GridService_OnDestroyBlock(BreakResult result)
         {
             List<Transform> deleteBlockViews = new List<Transform>();
 
             foreach (var block in _blockViewList)
             {
-                if (block.TryGetComponent<BlockView>(out BlockView blockView))
+                if (block.TryGetComponent<NormalBlockView>(out NormalBlockView blockView))
                 {
-                    if (blockView.BlockData.Index == index)
+                    if (blockView.BlockData.GetIndex() == result.index)
                     {
                         deleteBlockViews.Add(block);
                     }
@@ -106,7 +106,7 @@ namespace VProject.Controllers
             }
         }
 
-        private void GridService_OnCreateBlock(Vector2Int index, Block block)
+        private void GridService_OnCreateBlock(Vector2Int index, IBreakableEntity block)
         {
             Vector3 spawnPosition = _grid.GetCellCenterWorld(new Vector3Int(index.x, index.y));
             Transform newBlockView = _blockViewFactory.GenerateBlockView(spawnPosition, block, _grid);

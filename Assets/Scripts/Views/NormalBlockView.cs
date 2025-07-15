@@ -1,30 +1,32 @@
 using System.Collections;
+using System.Drawing;
 using UnityEngine;
 using VProject.Domains;
+using static VProject.Domains.NormalBlock;
 using Grid = UnityEngine.Grid;
 
 namespace VProject.Views
 {
-    public class BlockView : MonoBehaviour
+    public class NormalBlockView : MonoBehaviour
     {
         [SerializeField] private Renderer _renderer;
 
-        [SerializeField] private Block _blockData;
+        [SerializeField] private IBreakableEntity _blockData;
         private Grid _grid;
 
-        public Block BlockData => _blockData;
+        public IBreakableEntity BlockData => _blockData;
 
         private void OnDisable()
         {
-            _blockData.OnValueChanged -= Block_OnValueChanged;
+            _blockData.OnIndexChanged -= Block_OnValueChanged;
         }
 
-        public void Bind(Block block, Grid grid)
+        public void Bind(NormalBlock block, Grid grid)
         {
             _blockData = block;
             _grid = grid;
-            SetColor(_blockData.Type);
-            block.OnValueChanged += Block_OnValueChanged;
+            _renderer.material.color = block.BlockColor;
+            block.OnIndexChanged += Block_OnValueChanged;
         }
 
         private void Block_OnValueChanged(Vector2Int index)
@@ -47,22 +49,6 @@ namespace VProject.Views
                 yield return null;
             }
             transform.position = destinationPosition;
-        }
-
-        private void SetColor(EBlockType type)
-        {
-            switch (type)
-            {
-                case EBlockType.Red:
-                    _renderer.material.color = Color.red;
-                    break;
-                case EBlockType.Yellow:
-                    _renderer.material.color = Color.yellow;
-                    break;
-                case EBlockType.Green:
-                    _renderer.material.color = Color.green;
-                    break;
-            }
         }
     }
 }

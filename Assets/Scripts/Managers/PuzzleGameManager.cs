@@ -8,7 +8,8 @@ namespace VProject.Managers
 {
     public class PuzzleGameManager : MonoBehaviour
     {
-        private const float DEFAULT_PLAYTIME = 10f;
+        private const float DEFAULT_STARTTIME = 3f;
+        private const float DEFAULT_PLAYTIME = 60f;
 
         [SerializeField] private GridController _gridController;
         [SerializeField] private InputHandler _inputHandler;
@@ -36,7 +37,7 @@ namespace VProject.Managers
             _inputHandler.Enabled = false;
 
             _scoreService = new ScoreService(_gridController.GridService);
-            _timer.StartTimer(4f);
+            _timer.StartTimer(DEFAULT_STARTTIME);
             _timer.OnTimerEnded += Timer_OnTimerEnded;
 
             OnPuzzleGameInitialized?.Invoke();
