@@ -38,7 +38,7 @@ namespace VProject.Controllers
 
         private void Timer_OnTick(int time)
         {
-            if (_puzzleGameManager.IsGameStarted == false)
+            if (_puzzleGameManager.GameState == EGameState.Ready)
             {
                 if (_startTimerText.gameObject.activeSelf == false)
                     _startTimerText.gameObject.SetActive(true);
@@ -46,7 +46,7 @@ namespace VProject.Controllers
                 int outputTime = _startCount - time;
                 _startTimerText.text = outputTime.ToString();
             }
-            else
+            else if (_puzzleGameManager.GameState == EGameState.InGame)
             {
                 int outputTime = _puzzleGameManager.Timer.LeftTimeTick;
                 _playTimerText.text = outputTime.ToString();
@@ -55,7 +55,7 @@ namespace VProject.Controllers
 
         private void Timer_OnTimerEnded()
         {
-            if (_puzzleGameManager.IsGameStarted)
+            if (_puzzleGameManager.GameState == EGameState.InGame)
             {
                 _playTimerText.text = "END";
             }

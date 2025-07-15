@@ -5,9 +5,17 @@ using VProject.Domains;
 using VProject.Services;
 using VProject.Controllers;
 using VProject.Utils;
+using UnityEngine.SceneManagement;
 
 namespace VProject.Managers
 {
+    public enum EGameState
+    {
+        Ready,
+        InGame,
+        End,
+    }
+
     public class PuzzleGameManager : MonoBehaviour
     {
         private const float DEFAULT_STARTTIME = 4f;
@@ -19,10 +27,10 @@ namespace VProject.Managers
         private ScoreService _scoreService;
 
         private Timer _timer;
-        private bool _isGameStarted = false;
+        private EGameState _gameState;
 
         public Timer Timer => _timer;
-        public bool IsGameStarted => _isGameStarted;
+        public EGameState GameState => _gameState;
 
         public ScoreService ScoreService => _scoreService;
 
@@ -34,6 +42,24 @@ namespace VProject.Managers
         private void Awake()
         {
             _timer = gameObject.AddComponent<Timer>();
+        }
+
+        private void OnEnable()
+        {
+            InputHandler.OnClickAction += InputHandler_OnClickAction;
+        }
+
+        private void OnDisable()
+        {
+            InputHandler.OnClickAction -= InputHandler_OnClickAction;
+        }
+
+        private void InputHandler_OnClickAction()
+        {
+            if (_gameState == EGameState.End)
+            {
+                SceneManager.LoadSceneAsync("MainScene");
+            }
         }
 
         private void Start()
@@ -49,7 +75,7 @@ namespace VProject.Managers
 
         private void Timer_OnTimerEnded()
         {
-            if (_isGameStarted == false)
+            if (_gameState == EGameState.Ready)
             {
                 StartPuzzleGame();
             }
@@ -60,15 +86,10 @@ namespace VProject.Managers
             }
         }
 
-        private void OnDisable()
-        {
-            _scoreService.SaveScoreData();
-        }
-
         private void StartPuzzleGame()
         {
             _inputHandler.Enabled = true;
-            _isGameStarted = true;
+            _gameState = EGameState.InGame;
             _timer.StartTimer(DEFAULT_PLAYTIME);
             OnPuzzleGameStarted?.Invoke();
         }
@@ -76,12 +97,14 @@ namespace VProject.Managers
         private void EndPuzzleGame()
         {
             _inputHandler.Enabled = false;
-            _isGameStarted = false;
+            _gameState = EGameState.End;
+            _scoreService.SaveScoreData();
             OnPuzzleGameEnded?.Invoke();
         }
 
         private void ShowScoreBoard()
         {
+            _inputHandler.Enabled = true;
             OnShowScoreBoard?.Invoke(_scoreService.TopScoreList);
         }
     }
