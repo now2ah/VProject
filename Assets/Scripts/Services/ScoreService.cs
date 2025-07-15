@@ -1,6 +1,6 @@
 using VProject.Domains;
-using UnityEngine;
 using System;
+using System.Collections.Generic;
 using VProject.Utils;
 
 namespace VProject.Services
@@ -13,10 +13,16 @@ namespace VProject.Services
         private GridService _gridService;
 
         private Score _currentScore;
-        private Score _highestScore;
+        private List<Score> _topScoreList;
 
-        public Score CurrentScore => _currentScore;
-        public Score HighestScore => _highestScore;
+        public int HighestScore()
+        {
+            if (_topScoreList == null || _topScoreList.Count == 0)
+                throw new Exception("Invalid Top Score List");
+
+            return _topScoreList[0].ScoreValue;
+        }
+        public IReadOnlyList<Score> TopScoreList => _topScoreList;
 
         public event Action<int> OnCurrentScoreValueChanged;
         public event Action<int> OnHighestScoreValueChanged;
@@ -25,7 +31,11 @@ namespace VProject.Services
         {
             _gridService = gridService;
             _currentScore = new Score(0);
-            _highestScore = new Score(0);
+            _topScoreList = new List<Score>();
+            for (int i = 0; i < 5; ++i)
+            {
+                _topScoreList.Add(new Score(0));
+            }
 
             LoadScoreData();
 
@@ -34,7 +44,12 @@ namespace VProject.Services
 
         public void SaveScoreData()
         {
-            HighestScoreDTO dto = new HighestScoreDTO(_highestScore.ScoreValue);
+            int[] scoreArray = new int[_topScoreList.Count];
+            for (int i = 0; i < _topScoreList.Count; ++i)
+            {
+                scoreArray[i] = _topScoreList[i].ScoreValue;
+            }
+            HighestScoreDTO dto = new HighestScoreDTO(scoreArray);
             string jsonData = JsonSerializer.Serialize(dto);
             FileManager.SaveFile(jsonData, HIGHEST_SCORE_FILE_NAME);
         }
@@ -47,8 +62,12 @@ namespace VProject.Services
                 return;
 
             HighestScoreDTO dto = JsonSerializer.Deserialize<HighestScoreDTO>(json) as HighestScoreDTO;
-            _highestScore.ScoreValue = dto.highestScore;
-            OnHighestScoreValueChanged?.Invoke(_highestScore.ScoreValue);
+            for (int i = 0; i < _topScoreList.Count; ++i)
+            {
+                _topScoreList[i].ScoreValue = dto.highestScore[i];
+            }
+
+            OnHighestScoreValueChanged?.Invoke(_topScoreList[0].ScoreValue);
         }
 
         private void GridService_OnDestroyBlock(BreakResult result)
@@ -56,10 +75,19 @@ namespace VProject.Services
             _currentScore.GainScore(DEFAULT_BLOCKSCORE);
             OnCurrentScoreValueChanged?.Invoke(_currentScore.ScoreValue);
 
-            if (_currentScore.ScoreValue >= _highestScore.ScoreValue)
+            for (int i = 0; i < _topScoreList.Count; ++i)
             {
-                _highestScore.ScoreValue = _currentScore.ScoreValue;
-                OnHighestScoreValueChanged?.Invoke(_highestScore.ScoreValue);
+                if (_topScoreList[i].ScoreValue <= _currentScore.ScoreValue)
+                {
+                    _topScoreList[i].ScoreValue = _currentScore.ScoreValue;
+
+                    if (i == 0)
+                    {
+                        OnHighestScoreValueChanged?.Invoke(_topScoreList[0].ScoreValue);
+                    }
+
+                    break;
+                }
             }
         }
     }
@@ -67,9 +95,9 @@ namespace VProject.Services
     [Serializable]
     public class HighestScoreDTO
     {
-        public int highestScore;
+        public int[] highestScore;
 
-        public HighestScoreDTO(int highestScore)
+        public HighestScoreDTO(int[] highestScore)
         {
             this.highestScore = highestScore;
         }

@@ -24,7 +24,7 @@ namespace VProject.UIs
         private void PuzzleGameManager_OnPuzzleGameInitialized()
         {
             _puzzleGameManager.ScoreService.OnHighestScoreValueChanged += ScoreService_OnHighestScoreValueChanged;
-            _highestScoreValueText.text = _puzzleGameManager.ScoreService.HighestScore.ScoreValue.ToString();
+            _highestScoreValueText.text = _puzzleGameManager.ScoreService.HighestScore().ToString();
         }
 
         private void ScoreService_OnHighestScoreValueChanged(int highestScoreValue)

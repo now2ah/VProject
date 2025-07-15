@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using VProject.Domains;
 using VProject.Services;
 using VProject.Controllers;
 using VProject.Utils;
@@ -9,7 +11,7 @@ namespace VProject.Managers
     public class PuzzleGameManager : MonoBehaviour
     {
         private const float DEFAULT_STARTTIME = 4f;
-        private const float DEFAULT_PLAYTIME = 60f;
+        private const float DEFAULT_PLAYTIME = 10f;
 
         [SerializeField] private GridController _gridController;
         [SerializeField] private InputHandler _inputHandler;
@@ -26,6 +28,8 @@ namespace VProject.Managers
 
         public event Action OnPuzzleGameInitialized;
         public event Action OnPuzzleGameStarted;
+        public event Action OnPuzzleGameEnded;
+        public event Action<IReadOnlyList<Score>> OnShowScoreBoard;
 
         private void Awake()
         {
@@ -52,6 +56,7 @@ namespace VProject.Managers
             else
             {
                 EndPuzzleGame();
+                Invoke("ShowScoreBoard", 2.0f);
             }
         }
 
@@ -72,6 +77,12 @@ namespace VProject.Managers
         {
             _inputHandler.Enabled = false;
             _isGameStarted = false;
+            OnPuzzleGameEnded?.Invoke();
+        }
+
+        private void ShowScoreBoard()
+        {
+            OnShowScoreBoard?.Invoke(_scoreService.TopScoreList);
         }
     }
 }
