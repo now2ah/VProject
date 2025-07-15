@@ -72,7 +72,7 @@ namespace VProject.Services
 
         private void GridService_OnDestroyBlock(BreakResult result)
         {
-            _currentScore.GainScore(DEFAULT_BLOCKSCORE);
+            _currentScore.GainScore(result.rewardScore);
             OnCurrentScoreValueChanged?.Invoke(_currentScore.ScoreValue);
 
             for (int i = 0; i < _topScoreList.Count; ++i)

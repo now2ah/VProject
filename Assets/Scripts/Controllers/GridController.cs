@@ -31,25 +31,16 @@ namespace VProject.Controllers
             _blockViewFactory = GetComponent<BlockViewFactory>();
             _fxSpawner = GetComponent<FXSpawner>();
             AlignCameraToGrid(_grid);
-            Vector3 gridCenterPosition = new Vector3
-                (
-                    (_grid.cellSize.x * _gridService.GetGridSize()) / 2,
-                    (_grid.cellSize.y * _gridService.GetGridSize()) / 2,
-                    0
-                );
-            OnGridViewGenerated?.Invoke(gridCenterPosition, _gridService.GetGridSize());
         }
 
         private void OnEnable()
         {
-            InputHandler.OnClickAction += InputHandler_OnClickAction;
             _gridService.OnDestroyBlock += GridService_OnDestroyBlock;
             _gridService.OnCreateBlock += GridService_OnCreateBlock;
         }
 
         private void OnDisable()
         {
-            InputHandler.OnClickAction -= InputHandler_OnClickAction;
             _gridService.OnDestroyBlock -= GridService_OnDestroyBlock;
             _gridService.OnCreateBlock -= GridService_OnCreateBlock;
         }
@@ -65,11 +56,18 @@ namespace VProject.Controllers
                     _blockViewList.Add(newBlockView);
                 }
             }
+
+            Vector3 gridCenterPosition = new Vector3
+                (
+                    (_grid.cellSize.x * _gridService.GetGridSize()) / 2,
+                    (_grid.cellSize.y * _gridService.GetGridSize()) / 2,
+                    0
+                );
+            OnGridViewGenerated?.Invoke(gridCenterPosition, _gridService.GetGridSize());
         }
 
-        private void InputHandler_OnClickAction()
+        public void ProcessInput(Ray ray)
         {
-            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.value);
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Block"))

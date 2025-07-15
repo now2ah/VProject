@@ -1,5 +1,7 @@
 using UnityEngine;
 using VProject.Controllers;
+using VProject.Managers;
+using VProject.Utils;
 
 namespace VProject.Views
 {
@@ -23,7 +25,7 @@ namespace VProject.Views
         {
             transform.position = new Vector3(centerPosition.x, centerPosition.y, BACKGROUND_Z);
 
-            float scaleRatio = gridSize / 4;
+            float scaleRatio = gridSize / 3;
             if (scaleRatio < 1)
             {
                 scaleRatio = 1;

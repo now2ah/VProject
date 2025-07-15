@@ -5,7 +5,10 @@ using VProject.Domains;
 using VProject.Services;
 using VProject.Controllers;
 using VProject.Utils;
+using VProject.UIs;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
+using VProject.Views;
 
 namespace VProject.Managers
 {
@@ -19,7 +22,7 @@ namespace VProject.Managers
     public class PuzzleGameManager : MonoBehaviour
     {
         private const float DEFAULT_STARTTIME = 4f;
-        private const float DEFAULT_PLAYTIME = 10f;
+        private const float DEFAULT_PLAYTIME = 30f;
 
         [SerializeField] private GridController _gridController;
         [SerializeField] private InputHandler _inputHandler;
@@ -56,7 +59,12 @@ namespace VProject.Managers
 
         private void InputHandler_OnClickAction()
         {
-            if (_gameState == EGameState.End)
+            if (_gameState == EGameState.InGame)
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.value);
+                _gridController.ProcessInput(ray);
+            }
+            else if (_gameState == EGameState.End)
             {
                 SceneManager.LoadSceneAsync("MainScene");
             }
