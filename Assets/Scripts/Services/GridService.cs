@@ -45,7 +45,7 @@ namespace VProject.Services
                 OnMoveBlock?.Invoke(origin, destination);
             });
 
-            _grid.FillEmptyBlocks((index, block) =>
+            _grid.GenerateNewBlocks((index, block) =>
             {
                 OnCreateBlock?.Invoke(index, block);
             });

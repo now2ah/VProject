@@ -93,8 +93,10 @@ namespace VProject.Domains
             }
         }
 
-        public void FillEmptyBlocks(Action<Vector2Int, Block> onCreateCallback)
+        public void GenerateNewBlocks(Action<Vector2Int, Block> onCreateCallback)
         {
+            List<Block> fallBlockList = new List<Block>();
+
             for (int y = 0; y < _blockGrid.GetLength(0); ++y)
             {
                 for (int x = 0; x < _blockGrid.GetLength(1); ++x)
@@ -102,11 +104,21 @@ namespace VProject.Domains
                     if (_blockGrid[y, x].IsEmptyBlock())
                     {
                         Vector2Int newBlockIndex = new Vector2Int(x, y);
-                        _blockGrid[y, x] = _blockFactory.CreateRandomBlock(newBlockIndex);
-                        //Debug.Log($"{_blockGrid[y, x]} generated at {newBlockIndex}");
-                        onCreateCallback?.Invoke(newBlockIndex, _blockGrid[y, x]);
+                        Block newBlock = _blockFactory.CreateRandomBlock(newBlockIndex);
+
+                        fallBlockList.Add(newBlock);
+                        _blockGrid[y, x] = newBlock;
+
+                        Vector2Int newBlockFallIndex = new Vector2Int(newBlockIndex.x, newBlockIndex.y + 2);
+
+                        onCreateCallback?.Invoke(newBlockFallIndex, _blockGrid[y, x]);
                     }
                 }
+            }
+
+            foreach (var block in fallBlockList)
+            {
+                block.ChangeIndex(block.Index);
             }
         }
 
