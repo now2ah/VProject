@@ -42,8 +42,6 @@ namespace VProject.Utils
             {
                 _isClicked = true;
             }
-                
         }
     }
-
 }

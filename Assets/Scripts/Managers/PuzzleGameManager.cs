@@ -8,7 +8,7 @@ namespace VProject.Managers
 {
     public class PuzzleGameManager : MonoBehaviour
     {
-        private const float DEFAULT_STARTTIME = 3f;
+        private const float DEFAULT_STARTTIME = 4f;
         private const float DEFAULT_PLAYTIME = 60f;
 
         [SerializeField] private GridController _gridController;
