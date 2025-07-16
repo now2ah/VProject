@@ -14,6 +14,11 @@ public class MainScene : MonoBehaviour
         InputHandler.OnClickAction -= InputHandler_OnClickAction;
     }
 
+    private void Start()
+    {
+        AudioManager.Instance.PlayBgm(AudioManager.eBgm.BGM_MAIN);
+    }
+
     private void InputHandler_OnClickAction()
     {
         SceneManager.LoadSceneAsync("GameScene");

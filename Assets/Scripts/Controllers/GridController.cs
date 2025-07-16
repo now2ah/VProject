@@ -77,6 +77,8 @@ namespace VProject.Controllers
 
                     _fxSpawner.SpawnFX(worldPosition);
 
+                    AudioManager.Instance.PlaySfx(AudioManager.ESfx.HIT);
+
                     _gridService.ProcessInput(cellPosition.x, cellPosition.y);
                 }
             }

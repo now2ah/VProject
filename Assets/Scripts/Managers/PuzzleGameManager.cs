@@ -79,6 +79,8 @@ namespace VProject.Managers
             _timer.OnTimerEnded += Timer_OnTimerEnded;
 
             OnPuzzleGameInitialized?.Invoke();
+
+            AudioManager.Instance.PlayBgm(AudioManager.eBgm.BGM_GAME);
         }
 
         private void Timer_OnTimerEnded()
@@ -108,6 +110,8 @@ namespace VProject.Managers
             _gameState = EGameState.End;
             _scoreService.SaveScoreData();
             OnPuzzleGameEnded?.Invoke();
+
+            AudioManager.Instance.PlaySfx(AudioManager.ESfx.END);
         }
 
         private void ShowScoreBoard()
