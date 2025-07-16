@@ -21,6 +21,7 @@ namespace VProject.Domains
     {
         None,
         Normal,
+        ColorBomb
     }
 
     public enum EBlockState
@@ -94,6 +95,36 @@ namespace VProject.Domains
         {
             _index = index;
             _type = EBlockType.Normal;
+            _state = EBlockState.Idle;
+            _blockColor = blockColor;
+            _blockEffect = blockEffect;
+        }
+
+        public override BreakResult Break()
+        {
+            BreakResult result = base.Break();
+            result.rewardScore = 10;
+
+            return result;
+        }
+
+        public override void ApplyEffect(GridService gridService)
+        {
+            _blockEffect.Execute(_index, gridService);
+        }
+    }
+
+    public class ColorBombBlock : Block
+    {
+        private Color _blockColor;
+        private IBlockEffect _blockEffect;
+
+        public Color BlockColor => _blockColor;
+
+        public ColorBombBlock(Vector2Int index, Color blockColor, IBlockEffect blockEffect) : base(index)
+        {
+            _index = index;
+            _type = EBlockType.ColorBomb;
             _state = EBlockState.Idle;
             _blockColor = blockColor;
             _blockEffect = blockEffect;

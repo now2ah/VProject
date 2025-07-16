@@ -49,6 +49,11 @@ namespace VProject.Services
             return _grid.GetConnectedBlocks(index.x, index.y);
         }
 
+        public IReadOnlyList<Vector2Int> GetSameColorBlocks(Vector2Int index)
+        {
+            return _grid.GetSameColorBlocks(index.x, index.y);
+        }
+
         public void DestroyBlocks(IReadOnlyList<Vector2Int> destroyBlockList)
         {
             foreach (var index in destroyBlockList)

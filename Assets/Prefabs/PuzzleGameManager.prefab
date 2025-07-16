@@ -47,7 +47,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _gridController: {fileID: 3953083765319515332}
   _inputHandler: {fileID: 0}
-  _background: {fileID: 0}
 --- !u!1 &5245734999800688612
 GameObject:
   m_ObjectHideFlags: 0
@@ -119,7 +118,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c909b87043d2f3f4e800872205b814ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _blockViewPrefab: {fileID: 4258827460612490860, guid: bd395302ef972064697c156990b1f186, type: 3}
+  _normalBlockViewPrefab: {fileID: 4258827460612490860, guid: bd395302ef972064697c156990b1f186, type: 3}
+  _colorBombBlockViewPrefab: {fileID: 1361209196736296886, guid: 64ae059b1a975124c85aa1fe59d8ee60, type: 3}
 --- !u!114 &3287520427078896258
 MonoBehaviour:
   m_ObjectHideFlags: 0

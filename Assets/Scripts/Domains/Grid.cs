@@ -74,15 +74,32 @@ namespace VProject.Domains
                 }
             }
 
-            //StringBuilder sb = new StringBuilder();
-            //foreach (var block in connectedBlockList)
-            //{
-            //    sb.Append(block.x.ToString());
-            //    sb.Append(", ");
-            //    sb.Append(block.y.ToString());
-            //}
-            //Debug.Log(sb.ToString());
             return connectedBlockList;
+        }
+
+        public List<Vector2Int> GetSameColorBlocks(int x, int y)
+        {
+            if (_blockGrid[y, x] is ColorBombBlock == false)
+                throw new Exception($"Invalid Block Type : {_blockGrid[y, x].GetBlockType()}");
+
+            Color blockColor = ((ColorBombBlock)_blockGrid[y, x]).BlockColor;
+
+            List<Vector2Int> sameColorBlockList = new List<Vector2Int>();
+
+            for (int i = 0; i < _blockGrid.GetLength(1); ++i)
+            {
+                for (int j = 0; j < _blockGrid.GetLength(0); ++j)
+                {
+                    if (_blockGrid[j, i] is NormalBlock)
+                    {
+                        if (blockColor == ((NormalBlock)_blockGrid[j, i]).BlockColor)
+                        {
+                            sameColorBlockList.Add(new Vector2Int(i, j));
+                        }
+                    }
+                }
+            }
+            return sameColorBlockList;
         }
 
         public void ApplyGridGravity(Action<Vector2Int, Vector2Int> onMoveCallback)
@@ -117,8 +134,19 @@ namespace VProject.Domains
                 {
                     if (_blockGrid[y, x].IsEmptyBlock())
                     {
+                        Block newBlock = null;
                         Vector2Int newBlockIndex = new Vector2Int(x, y);
-                        Block newBlock = _blockFactory.CreateBlock(newBlockIndex, EBlockType.Normal);
+
+                        System.Random random = new System.Random();
+                        int randomNumber = random.Next(0, 100);
+                        if (randomNumber >= 99)
+                        {
+                            newBlock = _blockFactory.CreateBlock(newBlockIndex, EBlockType.ColorBomb);
+                        }
+                        else
+                        {
+                            newBlock = _blockFactory.CreateBlock(newBlockIndex, EBlockType.Normal);
+                        }
 
                         fallBlockList.Add(newBlock);
                         _blockGrid[y, x] = newBlock;

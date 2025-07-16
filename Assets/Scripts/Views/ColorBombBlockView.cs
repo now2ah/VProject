@@ -6,7 +6,7 @@ using Grid = UnityEngine.Grid;
 
 namespace VProject.Views
 {
-    public class NormalBlockView : MonoBehaviour
+    public class ColorBombBlockView : MonoBehaviour
     {
         [SerializeField] private Renderer _renderer;
 
@@ -20,7 +20,7 @@ namespace VProject.Views
             _blockData.OnIndexChanged -= Block_OnValueChanged;
         }
 
-        public void Bind(NormalBlock block, Grid grid)
+        public void Bind(ColorBombBlock block, Grid grid)
         {
             _blockData = block;
             _grid = grid;

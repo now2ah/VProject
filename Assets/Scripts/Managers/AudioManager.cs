@@ -14,7 +14,8 @@ public class AudioManager : MonoBehaviour
     public enum ESfx
     {
         HIT,
-        END
+        END,
+        COLORBOMB
     }
 
     private static AudioManager _instance;

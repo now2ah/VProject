@@ -13,4 +13,16 @@ namespace VProject.Domains
             gridService.DestroyBlocks(connectedBlockList);
         }
     }
+
+    public class ColorBombEffect : IBlockEffect
+    {
+        public void Execute(Vector2Int index, GridService gridService)
+        {
+            IReadOnlyList<Vector2Int> sameColorBlockList = gridService.GetSameColorBlocks(index);
+
+            gridService.DestroyBlocks(sameColorBlockList);
+
+            AudioManager.Instance.PlaySfx(AudioManager.ESfx.COLORBOMB);
+        }
+    }
 }

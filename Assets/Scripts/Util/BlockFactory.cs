@@ -8,6 +8,8 @@ namespace VProject.Utils
 {
     public class BlockFactory
     {
+        private readonly Random _random = new Random();
+
         public Block CreateBlock(Vector2Int index, EBlockType type)
         {
             switch (type)
@@ -18,9 +20,8 @@ namespace VProject.Utils
                     return block;
 
                 case EBlockType.Normal:
-                    Random random = new Random();
-                    int randomColor = random.Next(0, Enum.GetValues(typeof(ENormalBlockColor)).Length);
-                    switch ((ENormalBlockColor)randomColor)
+                    int randomColorNormal = _random.Next(0, Enum.GetValues(typeof(ENormalBlockColor)).Length);
+                    switch ((ENormalBlockColor)randomColorNormal)
                     {
                         case ENormalBlockColor.Red:
                             return new NormalBlock(index, Color.red, new NormalBlockEffect());
@@ -30,6 +31,20 @@ namespace VProject.Utils
                             return new NormalBlock(index, Color.green, new NormalBlockEffect());
                         default:
                             throw new Exception("Invalid Normal Block Color");
+                    }
+
+                case EBlockType.ColorBomb:
+                    int randomColorCB = _random.Next(0, Enum.GetValues(typeof(ENormalBlockColor)).Length);
+                    switch ((ENormalBlockColor)randomColorCB)
+                    {
+                        case ENormalBlockColor.Red:
+                            return new ColorBombBlock(index, Color.red, new ColorBombEffect());
+                        case ENormalBlockColor.Yellow:
+                            return new ColorBombBlock(index, Color.yellow, new ColorBombEffect());
+                        case ENormalBlockColor.Green:
+                            return new ColorBombBlock(index, Color.green, new ColorBombEffect());
+                        default:
+                            throw new Exception("Invalid Color Bomb Block Color");
                     }
                 default:
                     throw new Exception("Invalid Block Type");

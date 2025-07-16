@@ -8,19 +8,29 @@ namespace VProject.Utils
 {
     public class BlockViewFactory : MonoBehaviour
     {
-        [SerializeField] private Transform _blockViewPrefab;
+        [SerializeField] private Transform _normalBlockViewPrefab;
+        [SerializeField] private Transform _colorBombBlockViewPrefab;
 
         public Transform GenerateBlockView(Vector3 spawnPosition, IBreakableEntity block, Grid grid)
         {
             switch (block.GetBlockType())
             {
                 case EBlockType.Normal:
-                    Transform newBlockView = Instantiate(_blockViewPrefab, spawnPosition, Quaternion.identity);
-                    if (newBlockView.TryGetComponent<NormalBlockView>(out NormalBlockView blockView))
+                    Transform newNormalBlockView = Instantiate(_normalBlockViewPrefab, spawnPosition, Quaternion.identity);
+                    if (newNormalBlockView.TryGetComponent<NormalBlockView>(out NormalBlockView normalBlockView))
                     {
-                        blockView.Bind(block as NormalBlock, grid);
+                        normalBlockView.Bind(block as NormalBlock, grid);
                     }
-                    return newBlockView;
+                    return newNormalBlockView;
+
+                case EBlockType.ColorBomb:
+                    Transform newColorBombBlockView = Instantiate(_colorBombBlockViewPrefab, spawnPosition, Quaternion.identity);
+                    if (newColorBombBlockView.TryGetComponent<ColorBombBlockView>(out ColorBombBlockView colorBombBlockView))
+                    {
+                        colorBombBlockView.Bind(block as ColorBombBlock, grid);
+                    }
+                    return newColorBombBlockView;
+
                 default:
                     throw new Exception("Invalid Block Type");
             }
