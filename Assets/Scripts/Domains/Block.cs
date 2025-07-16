@@ -1,6 +1,7 @@
 ﻿
 using System;
 using UnityEngine;
+using VProject.Services;
 
 namespace VProject.Domains
 {
@@ -53,6 +54,11 @@ namespace VProject.Domains
             return new BreakResult(_index, 0);
         }
 
+        public virtual void ApplyEffect(GridService gridService)
+        {
+            //do nothing
+        }
+
         public bool IsEmptyBlock()
         {
             return _state == EBlockState.Empty;
@@ -80,22 +86,30 @@ namespace VProject.Domains
         }
 
         private Color _blockColor;
+        private IBlockEffect _blockEffect;
 
         public Color BlockColor => _blockColor;
 
-        public NormalBlock(Vector2Int index, Color blockColor) : base(index)
+        public NormalBlock(Vector2Int index, Color blockColor, IBlockEffect blockEffect) : base(index)
         {
             _index = index;
             _type = EBlockType.Normal;
             _state = EBlockState.Idle;
             _blockColor = blockColor;
+            _blockEffect = blockEffect;
         }
 
         public override BreakResult Break()
         {
             BreakResult result = base.Break();
             result.rewardScore = 10;
+
             return result;
+        }
+
+        public override void ApplyEffect(GridService gridService)
+        {
+            _blockEffect.Execute(_index, gridService);
         }
     }
 }

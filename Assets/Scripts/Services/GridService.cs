@@ -12,8 +12,6 @@ namespace VProject.Services
 
         private Grid _grid;
 
-        public Grid BlockGrid => _grid;
-
         public event Action<BreakResult> OnDestroyBlock;
         public event Action<Vector2Int, Vector2Int> OnMoveBlock;
         public event Action<Vector2Int, IBreakableEntity> OnCreateBlock;
@@ -29,16 +27,11 @@ namespace VProject.Services
 
         public void ProcessInput(int x, int y)
         {
-            List<Vector2Int> connectedBlockList = _grid.GetConnectedBlocks(x, y);
-            connectedBlockList.Add(new Vector2Int(x, y));
-            
-            foreach (var index in connectedBlockList)
+            _grid.DestroyBlock(x, y, this, (result) =>
             {
-                _grid.DestroyBlock(index.x, index.y, (result) =>
-                {
-                    OnDestroyBlock?.Invoke(result);
-                });
-            }
+                OnDestroyBlock?.Invoke(result);
+            });
+            _grid.BlockGrid[y, x].ApplyEffect(this);
 
             _grid.ApplyGridGravity((origin, destination) =>
             {
@@ -49,6 +42,22 @@ namespace VProject.Services
             {
                 OnCreateBlock?.Invoke(index, block);
             });
+        }
+
+        public IReadOnlyList<Vector2Int> GetConnectedBlocks(Vector2Int index)
+        {
+            return _grid.GetConnectedBlocks(index.x, index.y);
+        }
+
+        public void DestroyBlocks(IReadOnlyList<Vector2Int> destroyBlockList)
+        {
+            foreach (var index in destroyBlockList)
+            {
+                _grid.DestroyBlock(index.x, index.y, this, (result) =>
+                {
+                    OnDestroyBlock?.Invoke(result);
+                });
+            }
         }
     }
 }

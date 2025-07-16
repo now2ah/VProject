@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using VProject.Utils;
+using VProject.Services;
 
 namespace VProject.Domains
 {
@@ -29,7 +29,7 @@ namespace VProject.Domains
             }
         }
 
-        public void DestroyBlock(int x, int y, Action<BreakResult> callback = null)
+        public void DestroyBlock(int x, int y, GridService gridService, Action<BreakResult> callback = null)
         {
             BreakResult result = _blockGrid[y, x].Break();
 
@@ -146,8 +146,6 @@ namespace VProject.Domains
         private void SetEmptyBlock(int x, int y)
         {
             _blockGrid[y, x] = _blockFactory.CreateBlock(new Vector2Int(x, y), EBlockType.None);
-            Block block = _blockGrid[y, x] as Block;
-            block.Break();
         }
     }
 }

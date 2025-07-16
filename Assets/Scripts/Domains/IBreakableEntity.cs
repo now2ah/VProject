@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using VProject.Services;
 
 namespace VProject.Domains
 {
@@ -8,6 +9,7 @@ namespace VProject.Domains
         public EBlockType GetBlockType();
         public Vector2Int GetIndex();
         public BreakResult Break();
+        public void ApplyEffect(GridService gridService);
         public bool IsEmptyBlock();
         public void ChangeIndex(Vector2Int destinationIndex);
 

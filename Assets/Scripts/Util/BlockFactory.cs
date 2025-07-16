@@ -13,7 +13,9 @@ namespace VProject.Utils
             switch (type)
             {
                 case EBlockType.None:
-                    return new NormalBlock(index, Color.clear);
+                    Block block = new NormalBlock(index, Color.clear, new NormalBlockEffect());
+                    block.Break();
+                    return block;
 
                 case EBlockType.Normal:
                     Random random = new Random();
@@ -21,11 +23,11 @@ namespace VProject.Utils
                     switch ((ENormalBlockColor)randomColor)
                     {
                         case ENormalBlockColor.Red:
-                            return new NormalBlock(index, Color.red);
+                            return new NormalBlock(index, Color.red, new NormalBlockEffect());
                         case ENormalBlockColor.Yellow:
-                            return new NormalBlock(index, Color.yellow);
+                            return new NormalBlock(index, Color.yellow, new NormalBlockEffect());
                         case ENormalBlockColor.Green:
-                            return new NormalBlock(index, Color.green);
+                            return new NormalBlock(index, Color.green, new NormalBlockEffect());
                         default:
                             throw new Exception("Invalid Normal Block Color");
                     }
