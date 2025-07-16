@@ -24,7 +24,7 @@ namespace VProject.Views
         {
             _blockData = block;
             _grid = grid;
-            _renderer.material.color = block.BlockColor;
+            _renderer.material.color = block.GetBlockColor();
             block.OnIndexChanged += Block_OnValueChanged;
         }
 

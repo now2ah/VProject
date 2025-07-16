@@ -90,9 +90,16 @@ namespace VProject.Controllers
 
             foreach (var block in _blockViewList)
             {
-                if (block.TryGetComponent<NormalBlockView>(out NormalBlockView blockView))
+                if (block.TryGetComponent<NormalBlockView>(out NormalBlockView normalBlockView))
                 {
-                    if (blockView.BlockData.GetIndex() == result.index)
+                    if (normalBlockView.BlockData.GetIndex() == result.index)
+                    {
+                        deleteBlockViews.Add(block);
+                    }
+                }
+                else if (block.TryGetComponent<ColorBombBlockView>(out ColorBombBlockView colorBombBlockView))
+                {
+                    if (colorBombBlockView.BlockData.GetIndex() == result.index)
                     {
                         deleteBlockViews.Add(block);
                     }

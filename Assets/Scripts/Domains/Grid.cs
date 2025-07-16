@@ -36,7 +36,7 @@ namespace VProject.Domains
             callback?.Invoke(result);
         }
 
-        public List<Vector2Int> GetConnectedBlocks(int x, int y)
+        public List<Vector2Int> GetConnectedColorBlocks(int x, int y)
         {
             List<Vector2Int> connectedBlockList = new List<Vector2Int>();
 
@@ -49,6 +49,10 @@ namespace VProject.Domains
             {
                 Vector2Int rootIndex = connectedBlockQueue.Dequeue();
                 IBreakableEntity rootBlock = _blockGrid[rootIndex.y, rootIndex.x];
+
+                if (rootBlock is IColorBlock == false)
+                    throw new Exception("Invalid root color block");
+
                 isVisited[rootIndex.y, rootIndex.x] = true;
 
                 for (int i = 0; i < 4; ++i)
@@ -59,11 +63,12 @@ namespace VProject.Domains
                     if (newX >= 0 && newX < _blockGrid.GetLength(1) &&
                         newY >= 0 && newY < _blockGrid.GetLength(0))
                     {
-                        if (!isVisited[newY, newX] &&
-                            _blockGrid[newY, newX].GetBlockType() == rootBlock.GetBlockType())
+                        if (!isVisited[newY, newX])
                         {
-                            if (rootBlock.GetBlockType() == EBlockType.Normal &&
-                                ((NormalBlock)_blockGrid[newY, newX]).BlockColor == ((NormalBlock)rootBlock).BlockColor)
+                            if (_blockGrid[newY, newX] is IColorBlock == false)
+                                continue;
+
+                            if (((IColorBlock)_blockGrid[newY, newX]).GetBlockColor() == ((IColorBlock)rootBlock).GetBlockColor())
                             {
                                 isVisited[newY, newX] = true;
                                 connectedBlockQueue.Enqueue(new Vector2Int(newX, newY));
@@ -73,7 +78,6 @@ namespace VProject.Domains
                     }
                 }
             }
-
             return connectedBlockList;
         }
 
@@ -82,7 +86,7 @@ namespace VProject.Domains
             if (_blockGrid[y, x] is ColorBombBlock == false)
                 throw new Exception($"Invalid Block Type : {_blockGrid[y, x].GetBlockType()}");
 
-            Color blockColor = ((ColorBombBlock)_blockGrid[y, x]).BlockColor;
+            Color blockColor = ((ColorBombBlock)_blockGrid[y, x]).GetBlockColor();
 
             List<Vector2Int> sameColorBlockList = new List<Vector2Int>();
 
@@ -90,9 +94,9 @@ namespace VProject.Domains
             {
                 for (int j = 0; j < _blockGrid.GetLength(0); ++j)
                 {
-                    if (_blockGrid[j, i] is NormalBlock)
+                    if (_blockGrid[j, i] is IColorBlock)
                     {
-                        if (blockColor == ((NormalBlock)_blockGrid[j, i]).BlockColor)
+                        if (blockColor == ((IColorBlock)_blockGrid[j, i]).GetBlockColor())
                         {
                             sameColorBlockList.Add(new Vector2Int(i, j));
                         }

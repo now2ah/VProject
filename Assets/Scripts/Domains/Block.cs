@@ -77,7 +77,7 @@ namespace VProject.Domains
         }
     }
 
-    public class NormalBlock : Block
+    public class NormalBlock : Block, IColorBlock
     {
         public enum ENormalBlockColor
         {
@@ -89,7 +89,7 @@ namespace VProject.Domains
         private Color _blockColor;
         private IBlockEffect _blockEffect;
 
-        public Color BlockColor => _blockColor;
+        public Color GetBlockColor() => _blockColor;
 
         public NormalBlock(Vector2Int index, Color blockColor, IBlockEffect blockEffect) : base(index)
         {
@@ -114,12 +114,12 @@ namespace VProject.Domains
         }
     }
 
-    public class ColorBombBlock : Block
+    public class ColorBombBlock : Block, IColorBlock
     {
         private Color _blockColor;
         private IBlockEffect _blockEffect;
 
-        public Color BlockColor => _blockColor;
+        public Color GetBlockColor() => _blockColor;
 
         public ColorBombBlock(Vector2Int index, Color blockColor, IBlockEffect blockEffect) : base(index)
         {

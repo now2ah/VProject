@@ -46,7 +46,7 @@ namespace VProject.Services
 
         public IReadOnlyList<Vector2Int> GetConnectedBlocks(Vector2Int index)
         {
-            return _grid.GetConnectedBlocks(index.x, index.y);
+            return _grid.GetConnectedColorBlocks(index.x, index.y);
         }
 
         public IReadOnlyList<Vector2Int> GetSameColorBlocks(Vector2Int index)
