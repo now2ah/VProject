@@ -75,9 +75,17 @@ namespace VProject.Controllers
                     Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.value);
                     Vector3Int cellPosition = _grid.WorldToCell(worldPosition);
 
-                    _fxSpawner.SpawnFX(worldPosition);
-
-                    AudioManager.Instance.PlaySfx(AudioManager.ESfx.HIT);
+                    //NOTE : need to apply interface later
+                    if (hit.transform.gameObject.TryGetComponent<ColorBombBlockView>(out ColorBombBlockView colorBombBlockView))
+                    {
+                        _fxSpawner.SpawnFX(worldPosition, FXSpawner.EFx.COLORBOMB);
+                        AudioManager.Instance.PlaySfx(AudioManager.ESfx.COLORBOMB);
+                    }
+                    else
+                    {
+                        _fxSpawner.SpawnFX(worldPosition, FXSpawner.EFx.HIT);
+                        AudioManager.Instance.PlaySfx(AudioManager.ESfx.HIT);
+                    }
 
                     _gridService.ProcessInput(cellPosition.x, cellPosition.y);
                 }
