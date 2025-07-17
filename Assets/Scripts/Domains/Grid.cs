@@ -143,7 +143,7 @@ namespace VProject.Domains
 
                         System.Random random = new System.Random();
                         int randomNumber = random.Next(0, 100);
-                        if (randomNumber >= 99)
+                        if (randomNumber >= 95)
                         {
                             newBlock = _blockFactory.CreateBlock(newBlockIndex, EBlockType.ColorBomb);
                         }
