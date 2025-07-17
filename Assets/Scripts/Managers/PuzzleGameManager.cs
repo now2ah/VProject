@@ -9,6 +9,7 @@ using VProject.UIs;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
 using VProject.Views;
+using System.Collections;
 
 namespace VProject.Managers
 {
@@ -31,6 +32,9 @@ namespace VProject.Managers
 
         private Timer _timer;
         private EGameState _gameState;
+
+        private bool _isActive = true;
+        private Coroutine _deactiveInputCoroutine;
 
         public Timer Timer => _timer;
         public EGameState GameState => _gameState;
@@ -59,6 +63,9 @@ namespace VProject.Managers
 
         private void InputHandler_OnClickAction()
         {
+            if (_isActive == false)
+                return;
+
             if (_gameState == EGameState.InGame)
             {
                 Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.value);
@@ -68,6 +75,8 @@ namespace VProject.Managers
             {
                 SceneManager.LoadSceneAsync("MainScene");
             }
+
+            DeactiveInputForSeconds(0.5f);
         }
 
         private void Start()
@@ -118,6 +127,21 @@ namespace VProject.Managers
         {
             _inputHandler.Enabled = true;
             OnShowScoreBoard?.Invoke(_scoreService.TopScoreList);
+        }
+
+        private void DeactiveInputForSeconds(float deactiveTime)
+        {
+            if (_deactiveInputCoroutine != null)
+                StopCoroutine(_deactiveInputCoroutine);
+
+            _deactiveInputCoroutine = StartCoroutine(DeactiveInput(deactiveTime));
+        }
+
+        private IEnumerator DeactiveInput(float deactiveTime)
+        {
+            _isActive = false;
+            yield return new WaitForSeconds(deactiveTime);
+            _isActive = true;
         }
     }
 }

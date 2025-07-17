@@ -35,10 +35,8 @@ namespace VProject.Controllers
             if (fxTransform.TryGetComponent<ParticleSystem>(out ParticleSystem particle))
             {
                 yield return new WaitUntil(() => particle.isPlaying == false);
+                Destroy(fxTransform.gameObject);
             }
-
-            yield return null;
-            Destroy(fxTransform.gameObject);
         }
     }
 }
